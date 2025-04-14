@@ -1,0 +1,19 @@
+---
+# tasks file for subscription_allocation
+- name: Get existing subscription allocations
+  ansible.builtin.include_role:
+    name: subscription_allocation_info
+
+- name: Check for existing subscription allocation
+  ansible.builtin.set_fact:
+    rhsm_existing_subscription_allocation: "{{ rhsm_subscription_allocations['json']['body'] | selectattr('name','match',rhsm_subscription_allocation_name) }}"
+
+# - name: "Create subscription allocation {{ redhat_sub_allocation_name }}"
+#   ansible.builtin.uri:
+#     url: "{{ redhat_subscription_base_uri }}/allocations?name={{ redhat_sub_allocation_name | urlencode }}&version={{ redhat_subscription_satellite_version | urlencode }}"
+#     method: POST
+#     headers:
+#       Authorization: "Bearer {{ rh_access_token }}"
+#       Content-Type: application/json
+#   register: new_rh_sub_allocation
+#   when: rh_sub_allocation[0] is not defined

@@ -1,0 +1,15 @@
+---
+# tasks file for subscription_allocation_info
+- name: Refresh RHSM API Token
+  include_role:
+    name: rhsm_api_token
+  vars:
+    rhsm_api_token_refresh: true
+
+- name: Retrieve current subscription allocations
+  ansible.builtin.uri:
+    url: "{{ redhat_subscription_base_uri }}/allocations?type=Satellite"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ rhsm_access_token }}"
+  register: rhsm_subscription_allocations

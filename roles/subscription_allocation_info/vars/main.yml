@@ -1,0 +1,3 @@
+---
+# vars file for subscription_allocation_info
+redhat_subscription_base_uri: "https://api.access.redhat.com/management/v1"

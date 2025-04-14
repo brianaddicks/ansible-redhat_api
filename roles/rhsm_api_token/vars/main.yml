@@ -1,0 +1,3 @@
+---
+# vars file for rhsm_api_token
+redhat_subscription_base_uri: "https://api.access.redhat.com/management/v1"
