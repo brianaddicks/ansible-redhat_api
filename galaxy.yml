@@ -1,0 +1,23 @@
+---
+namespace: brianaddicks
+name: redhat_api
+version: 1.0.0
+description: Ansible roles to interact with Red Hat APIs.
+readme: README.md
+authors:
+  - Brian Addicks @brianaddicks
+
+repository: https://github.com/brianaddicks/ansible-redhat_api
+issues: https://github.com/brianaddicks/ansible-redhat_api/issues
+build_ignore:
+  - galaxy.yml.j2
+  - release.yml
+  - .github
+  - .ansiblelint.yml
+  - .yamllint.yml
+  - '*.tar.gz'
+license:
+  - GPL-3.0-or-later
+tags:
+  - redhat
+  - rhsm

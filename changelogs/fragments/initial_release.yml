@@ -1,0 +1,6 @@
+---
+major_changes:
+  - Added get_manifest role
+  - Added subscription_allocation role
+  - Added subscription_allocation_info role
+  - Added rhsm_api_token role
