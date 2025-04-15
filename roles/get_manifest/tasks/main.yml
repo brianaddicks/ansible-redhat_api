@@ -26,8 +26,8 @@
     status_code:
       - 200
       - 202
-  register: rh_manifest_export_status
-  until: rh_manifest_export_status.status == 200
+  register: rhsm_manifest_export_status
+  until: rhsm_manifest_export_status.status == 200
   retries: 5
   delay: 10
   vars:
@@ -35,7 +35,7 @@
 
 - name: "Download manifest file"
   ansible.builtin.uri:
-    url: "{{ rhsm_base_uri }}/allocations/{{ rhsm_subscription_allocation['uuid'] | urlencode }}/export/{{ rh_manifest_export_status['json']['body']['exportID'] | urlencode }}" # noqa yaml[line-length]
+    url: "{{ rhsm_base_uri }}/allocations/{{ rhsm_subscription_allocation['uuid'] | urlencode }}/export/{{ rhsm_manifest_export_status['json']['body']['exportID'] | urlencode }}" # noqa yaml[line-length]
     method: GET
     headers:
       Authorization: "Bearer {{ rhsm_access_token }}"

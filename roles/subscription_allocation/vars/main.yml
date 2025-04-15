@@ -1,3 +1,0 @@
----
-# vars file for subscription_allocation
-rhsm_base_uri: "https://api.access.redhat.com/management/v1"

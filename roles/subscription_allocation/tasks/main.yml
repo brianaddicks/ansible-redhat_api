@@ -52,7 +52,6 @@
     headers:
       Authorization: "Bearer {{ rhsm_access_token }}"
       Content-Type: application/json
-  register: attach_entitlement
   vars:
     rhsm_desired_subscription: "{{ (rhsm_subscriptions['json']['body'] | selectattr('subscriptionName', 'match', rhsm_subscription_name))[0] }}"
     rhsm_desired_subscription_pool_id: "{{ rhsm_desired_subscription['pools'][0]['id'] }}"
