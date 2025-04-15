@@ -8,7 +8,7 @@
 
 - name: Retrieve current subscription allocations
   ansible.builtin.uri:
-    url: "{{ redhat_subscription_base_uri }}/allocations?type=Satellite"
+    url: "{{ rhsm_base_uri }}/allocations?type=Satellite"
     method: GET
     headers:
       Authorization: "Bearer {{ rhsm_access_token }}"

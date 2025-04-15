@@ -3,11 +3,11 @@
   hosts: redhatconsole
   gather_facts: false
   vars:
-    rhsm_subscription_allocation_name: aap2
+    rhsm_subscription_allocation_name: aap
 
   tasks:
     - name: Get subscription allocation info
-      include_role:
+      ansible.builtin.include_role:
         name: subscription_allocation
 
   # vars:
@@ -68,15 +68,7 @@
   #       status_code: 204
   #     when: rh_sub_allocation['simpleContentAccess'] == "disabled"
 
-  #   - name: Attach desired entitlements
-  #     ansible.builtin.uri:
-  #       url: "{{ redhat_subscription_base_uri }}/allocations/{{ rh_sub_allocation['uuid'] | urlencode }}/entitlements?pool={{ my_rh_subscription['pools'][0]['id'] | urlencode }}&quantity={{ redhat_entitlement_allocation_count | urlencode }}"
-  #       method: POST
-  #       headers:
-  #         Authorization: "Bearer {{ rh_access_token }}"
-  #         Content-Type: application/json
-  #     register: attach_entitlement
-  #     when: rh_sub_allocation['entitlementQuantity'] < redhat_entitlement_allocation_count
+
 
   #   - name: Request manifest export
   #     ansible.builtin.uri:

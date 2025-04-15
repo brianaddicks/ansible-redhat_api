@@ -6,14 +6,30 @@
 
 - name: Check for existing subscription allocation
   ansible.builtin.set_fact:
-    rhsm_existing_subscription_allocation: "{{ rhsm_subscription_allocations['json']['body'] | selectattr('name','match',rhsm_subscription_allocation_name) }}"
+    rhsm_existing_subscription_allocation: >-
+      {{
+        rhsm_subscription_allocations['json']['body']
+        | selectattr('name', 'match', rhsm_subscription_allocation_name)
+      }}
 
-# - name: "Create subscription allocation {{ redhat_sub_allocation_name }}"
-#   ansible.builtin.uri:
-#     url: "{{ redhat_subscription_base_uri }}/allocations?name={{ redhat_sub_allocation_name | urlencode }}&version={{ redhat_subscription_satellite_version | urlencode }}"
-#     method: POST
-#     headers:
-#       Authorization: "Bearer {{ rh_access_token }}"
-#       Content-Type: application/json
-#   register: new_rh_sub_allocation
-#   when: rh_sub_allocation[0] is not defined
+- name: Create subscription allocation
+  when: rhsm_existing_subscription_allocation[0] is not defined
+  block:
+    - name: "Create subscription allocation {{ rhsm_subscription_allocation_name }}"
+      ansible.builtin.uri:
+        url: "{{ rhsm_base_uri }}/allocations?name={{ rhsm_subscription_allocation_name | urlencode }}&version={{ rhsm_subscription_allocation_satellite_version | urlencode }}"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ rhsm_access_token }}"
+          Content-Type: application/json
+      register: rhsm_new_subscription_allocation
+
+- name: Attach desired entitlements
+  ansible.builtin.uri:
+    url: "{{ rhsm_base_uri }}/allocations/{{ rh_sub_allocation['uuid'] | urlencode }}/entitlements?pool={{ my_rh_subscription['pools'][0]['id'] | urlencode }}&quantity={{ redhat_entitlement_allocation_count | urlencode }}"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ rh_access_token }}"
+      Content-Type: application/json
+  register: attach_entitlement
+  when: rh_sub_allocation['entitlementQuantity'] < redhat_entitlement_allocation_count
