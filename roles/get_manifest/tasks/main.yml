@@ -1,0 +1,42 @@
+---
+# tasks file for get_manifest
+
+- name: Get subscription allocation
+  ansible.builtin.include_role:
+    name: subscription_allocation_info
+
+- name: Set fact for existing subscription allocation
+  ansible.builtin.set_fact:
+    rhsm_subscription_allocation: "{{ rhsm_subscription_allocations[0] }}"
+
+- name: Request manifest export
+  ansible.builtin.uri:
+    url: "{{ rhsm_base_uri }}/allocations/{{ rhsm_subscription_allocation['uuid'] | urlencode }}/export"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ rhsm_access_token }}"
+  register: rhsm_manifest_export_request
+
+- name: Get export job status
+  ansible.builtin.uri:
+    url: "{{ rhsm_base_uri }}/allocations/{{ rhsm_subscription_allocation['uuid'] | urlencode }}/exportJob/{{ rhsm_export_job_id | urlencode }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ rhsm_access_token }}"
+    status_code:
+      - 200
+      - 202
+  register: rh_manifest_export_status
+  until: rh_manifest_export_status.status == 200
+  retries: 5
+  delay: 10
+  vars:
+    rhsm_export_job_id: "{{ rhsm_manifest_export_request['json']['body']['exportJobID'] }}"
+
+- name: "Download manifest file"
+  ansible.builtin.uri:
+    url: "{{ rhsm_base_uri }}/allocations/{{ rhsm_subscription_allocation['uuid'] | urlencode }}/export/{{ rh_manifest_export_status['json']['body']['exportID'] | urlencode }}" # noqa yaml[line-length]
+    method: GET
+    headers:
+      Authorization: "Bearer {{ rhsm_access_token }}"
+    dest: "{{ rhsm_manifest_dest | default('/tmp/manifest.zip') }}"

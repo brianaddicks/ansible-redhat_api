@@ -1,3 +1,4 @@
 ---
 # defaults file for subscription_allocation
 rhsm_subscription_allocation_satellite_version: sat-6.16
+rhsm_subscription_entitlement_count: 1

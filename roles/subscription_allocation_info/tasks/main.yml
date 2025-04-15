@@ -1,7 +1,7 @@
 ---
 # tasks file for subscription_allocation_info
 - name: Refresh RHSM API Token
-  include_role:
+  ansible.builtin.include_role:
     name: rhsm_api_token
   vars:
     rhsm_api_token_refresh: true
@@ -13,3 +13,12 @@
     headers:
       Authorization: "Bearer {{ rhsm_access_token }}"
   register: rhsm_subscription_allocations
+
+- name: Retrieve specific subscription allocations
+  when: rhsm_subscription_name is defined
+  ansible.builtin.set_fact:
+    rhsm_subscription_allocations: >-
+      {{
+        rhsm_subscription_allocations['json']['body']
+        | selectattr('name', 'match', rhsm_subscription_allocation_name)
+      }}

@@ -4,103 +4,15 @@
   gather_facts: false
   vars:
     rhsm_subscription_allocation_name: aap
+    rhsm_subscription_name: Employee SKU
+    rhsm_subscription_entitlement_count: 50
+    rhsm_manifest_dest: ./manifest.zip
 
   tasks:
-    - name: Get subscription allocation info
+    # - name: Get subscription allocation info
+    #   ansible.builtin.include_role:
+    #     name: subscription_allocation
+
+    - name: Get manifest
       ansible.builtin.include_role:
-        name: subscription_allocation
-
-  # vars:
-  #   redhat_contract_number: "11111111"
-  #   redhat_sub_allocation_name: test-lifecycle4
-  #   redhat_subscription_name: 'My Subscription'
-  #   redhat_entitlement_allocation_count: 10
-  #   redhat_subscription_satellite_version: "sat-6.11"
-  #   redhat_api_offline_token: "{{ lookup('ansible.builtin.env', 'REDHAT_API_OFFLINE_TOKEN') }}"
-  #   redhat_subscription_base_uri: "https://api.access.redhat.com/management/v1"
-
-
-
-
-
-  #   # update subscription allocations, doing this because the output from creating a new sub allocation is different from just pulling them
-  #   - name: Retrieve current subscription allocations
-  #     ansible.builtin.uri:
-  #       url: "{{ redhat_subscription_base_uri }}/allocations?type=Satellite"
-  #       method: GET
-  #       headers:
-  #         Authorization: "Bearer {{ rh_access_token }}"
-  #     register: rh_subscription_allocations
-
-  #   - name: Check for existing subscription allocation
-  #     ansible.builtin.set_fact:
-  #       rh_sub_allocation: "{{ rh_subscription_allocations['json']['body'] | selectattr('name', 'match', redhat_sub_allocation_name) }}"
-
-  #   - name: Re-register subscription allocation fact
-  #     ansible.builtin.set_fact:
-  #       rh_sub_allocation: "{% if rh_sub_allocation[0] is defined %}{{ rh_sub_allocation[0] }}{% else %}{{ new_rh_sub_allocation['json']['body'] }}{% endif %}"
-
-  #   - name: Get subscription data
-  #     ansible.builtin.uri:
-  #       url: "{{ redhat_subscription_base_uri }}/subscriptions"
-  #       method: GET
-  #       headers:
-  #         Authorization: "Bearer {{ rh_access_token }}"
-  #     register: rh_subscriptions
-
-  #   - name: Register desired subscription facts
-  #     ansible.builtin.set_fact:
-  #       my_rh_subscription: "{{ (rh_subscriptions['json']['body'] | selectattr('subscriptionName', 'match', redhat_subscription_name))[0] }}"
-
-  #   - name: Register desired subscription facts
-  #     ansible.builtin.set_fact:
-  #       my_rh_subscription_pool_id: "{{ my_rh_subscription['pools'][0]['id'] }}"
-
-  #   - name: Enable Simple Content Access
-  #     ansible.builtin.uri:
-  #       url: "{{ redhat_subscription_base_uri }}/allocations/{{ rh_sub_allocation['uuid'] | urlencode }}"
-  #       method: PUT
-  #       body:
-  #         simpleContentAccess: enabled
-  #       headers:
-  #         Authorization: "Bearer {{ rh_access_token }}"
-  #       body_format: json
-  #       status_code: 204
-  #     when: rh_sub_allocation['simpleContentAccess'] == "disabled"
-
-
-
-  #   - name: Request manifest export
-  #     ansible.builtin.uri:
-  #       url: "{{ redhat_subscription_base_uri }}/allocations/{{ rh_sub_allocation['uuid'] | urlencode }}/export"
-  #       method: GET
-  #       headers:
-  #         Authorization: "Bearer {{ rh_access_token }}"
-  #     register: rh_manifest_export_request
-
-  #   - name: Register exportJobID
-  #     ansible.builtin.set_fact:
-  #       rh_export_job_id: "{{ rh_manifest_export_request['json']['body']['exportJobID'] }}"
-
-  #   - name: Get export job status
-  #     ansible.builtin.uri:
-  #       url: "{{ redhat_subscription_base_uri }}/allocations/{{ rh_sub_allocation['uuid'] | urlencode }}/exportJob/{{ rh_export_job_id | urlencode }}"
-  #       method: GET
-  #       headers:
-  #         Authorization: "Bearer {{ rh_access_token }}"
-  #       status_code:
-  #         - 200
-  #         - 202
-  #     register: rh_manifest_export_status
-  #     until: rh_manifest_export_status.status == 200
-  #     retries: 5
-  #     delay: 10
-
-  #   - name: "Download manifest file to {{ playbook_dir }}/manifest.zip"
-  #     ansible.builtin.uri:
-  #       url: "{{ redhat_subscription_base_uri }}/allocations/{{ rh_sub_allocation['uuid'] | urlencode }}/export/{{ rh_manifest_export_status['json']['body']['exportID'] | urlencode }}"
-  #       method: GET
-  #       headers:
-  #         Authorization: "Bearer {{ rh_access_token }}"
-  #       dest: "{{ playbook_dir }}/manifest.zip"
-  #     register: rh_manifest_download
+        name: get_manifest

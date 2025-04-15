@@ -1,0 +1,3 @@
+---
+# defaults file for get_manifest
+rhsm_manifest_dest: /tmp/manifest.zip

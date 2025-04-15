@@ -17,19 +17,42 @@
   block:
     - name: "Create subscription allocation {{ rhsm_subscription_allocation_name }}"
       ansible.builtin.uri:
-        url: "{{ rhsm_base_uri }}/allocations?name={{ rhsm_subscription_allocation_name | urlencode }}&version={{ rhsm_subscription_allocation_satellite_version | urlencode }}"
+        url: "{{ rhsm_base_uri }}/allocations?name={{ rhsm_subscription_allocation_name | urlencode }}&version={{ rhsm_subscription_allocation_satellite_version | urlencode }}" # noqa yaml[line-length]
         method: POST
         headers:
           Authorization: "Bearer {{ rhsm_access_token }}"
           Content-Type: application/json
-      register: rhsm_new_subscription_allocation
+      register: rhsm_subscription_allocation
+
+- name: Set fact for existing subscription allocation
+  when: rhsm_existing_subscription_allocation[0] is defined
+  ansible.builtin.set_fact:
+    rhsm_subscription_allocation: "{{ rhsm_existing_subscription_allocation[0] }}"
+
+- name: Get available subscriptions
+  ansible.builtin.uri:
+    url: "{{ rhsm_base_uri }}/subscriptions"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ rhsm_access_token }}"
+  register: rhsm_subscriptions
+
+- name: Get existing entitlements
+  ansible.builtin.uri:
+    url: "{{ rhsm_base_uri }}/allocations/{{ rhsm_subscription_allocation['uuid'] | urlencode }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ rhsm_access_token }}"
+  register: rhsm_existing_entitlements
 
 - name: Attach desired entitlements
   ansible.builtin.uri:
-    url: "{{ rhsm_base_uri }}/allocations/{{ rh_sub_allocation['uuid'] | urlencode }}/entitlements?pool={{ my_rh_subscription['pools'][0]['id'] | urlencode }}&quantity={{ redhat_entitlement_allocation_count | urlencode }}"
+    url: "{{ rhsm_base_uri }}/allocations/{{ rhsm_subscription_allocation['uuid'] | urlencode }}/entitlements?pool={{ rhsm_desired_subscription_pool_id | urlencode }}&quantity={{ rhsm_subscription_entitlement_count }}" # noqa yaml[line-length]
     method: POST
     headers:
-      Authorization: "Bearer {{ rh_access_token }}"
+      Authorization: "Bearer {{ rhsm_access_token }}"
       Content-Type: application/json
   register: attach_entitlement
-  when: rh_sub_allocation['entitlementQuantity'] < redhat_entitlement_allocation_count
+  vars:
+    rhsm_desired_subscription: "{{ (rhsm_subscriptions['json']['body'] | selectattr('subscriptionName', 'match', rhsm_subscription_name))[0] }}"
+    rhsm_desired_subscription_pool_id: "{{ rhsm_desired_subscription['pools'][0]['id'] }}"
